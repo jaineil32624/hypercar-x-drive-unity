@@ -2,6 +2,7 @@
 
 [![Play in browser](https://img.shields.io/badge/▶_Play-in_browser-36d3c4?style=for-the-badge)](https://jaineil32624.github.io/hypercar-x-drive-unity/play/)
 [![Android APK](https://img.shields.io/badge/Android-APK-3ddc84?style=for-the-badge&logo=android&logoColor=white)](https://jaineil32624.github.io/hypercar-x-drive-unity/downloads/HypercarX-Drive.apk)
+[![Unity Play](https://img.shields.io/badge/Unity_Play-play-000000?style=for-the-badge&logo=unity&logoColor=white)](https://play.unity.com/en/games/97c3a526-35bc-4ac6-bd0c-4ce596314c07/webgl-builds)
 [![Windows](https://img.shields.io/badge/Windows-download-0078d6?style=for-the-badge&logo=windows&logoColor=white)](https://jaineil32624.github.io/hypercar-x-drive-unity/downloads/HypercarX-Drive-Windows.zip)
 
 A 3D driving and racing game built in **Unity 6 (6000.3)** around the **HYPERCAR-X** electric hypercar. The car, its baked PBR textures and every physics number (mass, power, torque, grip, drag, downforce) come from the separate engineering project: [jaineil32624/hypercar-x](https://github.com/jaineil32624/hypercar-x).

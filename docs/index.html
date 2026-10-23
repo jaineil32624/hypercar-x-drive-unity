@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HYPERCAR-X Drive</title>
+<meta name="description" content="HYPERCAR-X Drive: a Unity 6 3D driving and racing game. Race AI, split-screen 2 players, ghost time trials, drag racing, autopilot. Play in your browser, on Android or on Windows.">
+<meta property="og:image" content="shots/04_race_chase.png">
+<style>
+:root{--bg:#05080c;--card:#0d141c;--line:#1c2836;--txt:#e5edf5;--dim:#8ea0b3;--acc:#36d3c4;--acc2:#7aa8ff;--good:#5ee08a;--hot:#ff8a3d}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+a{color:inherit}
+header{position:sticky;top:0;z-index:9;display:flex;justify-content:space-between;align-items:center;padding:12px 22px;background:rgba(5,8,12,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header b{letter-spacing:.16em;color:var(--acc)}header nav{display:flex;gap:16px;font-size:14px}header nav a{text-decoration:none;color:var(--dim)}
+.hero{position:relative;min-height:84vh;display:grid;place-items:center;text-align:center;overflow:hidden;background:#000}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;animation:pan 24s ease-in-out infinite alternate}
+.hero:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(5,8,12,.15),rgba(5,8,12,.92) 78%)}
+.hero .in{position:relative;z-index:2;padding:0 16px;animation:rise .9s cubic-bezier(.2,.8,.2,1)}
+h1{font-size:clamp(42px,9vw,110px);margin:0;line-height:1;letter-spacing:.06em;background:linear-gradient(90deg,#fff,var(--acc),var(--acc2));-webkit-background-clip:text;color:transparent}
+.tag{font-size:clamp(16px,2vw,21px);color:#d0dbe6;max-width:760px;margin:16px auto 26px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;flex-direction:column;align-items:flex-start;padding:13px 22px;border-radius:12px;border:1px solid var(--line);background:var(--card);text-decoration:none;font-weight:700;transition:.2s}
+.btn small{font-weight:400;color:var(--dim);font-size:12px}
+.btn:hover{transform:translateY(-3px);border-color:var(--acc);box-shadow:0 10px 30px rgba(54,211,196,.2)}
+.btn.p{background:linear-gradient(135deg,#1fb5a8,#2a7fd6);border:0}.btn.p small{color:#e0ffff}
+section{max-width:1180px;margin:0 auto;padding:68px 20px}
+h2{font-size:clamp(26px,3.6vw,40px);margin:0 0 6px}h2+p{color:var(--dim);margin:0 0 26px}
+.kick{color:var(--acc);letter-spacing:.2em;font-size:12px;text-transform:uppercase}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.m{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}.m b{color:var(--acc);font-size:18px}.m span{display:inline-block;font-size:11px;letter-spacing:.1em;color:var(--hot);margin-left:6px}.m p{margin:6px 0 0;color:var(--dim);font-size:14px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.gal figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:zoom-in;aspect-ratio:16/9;position:relative;background:#0b1118}
+.gal img{width:100%;height:100%;object-fit:cover;transition:transform .5s}.gal figure:hover img{transform:scale(1.05)}
+.gal figcaption{position:absolute;left:0;right:0;bottom:0;padding:20px 12px 8px;font-size:13px;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--acc)}td:first-child{color:var(--dim)}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 10px}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.dl a{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;transition:.25s}.dl a:hover{border-color:var(--acc);transform:translateY(-4px)}
+.dl h3{margin:6px 0 4px}.dl p{margin:0;color:var(--dim);font-size:14px}.dl .i{font-size:30px}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;place-items:center;z-index:20;padding:16px}.lb.on{display:grid}.lb img{max-width:96vw;max-height:86vh;border-radius:10px}
+.reveal{opacity:0;transform:translateY(28px);transition:all .8s cubic-bezier(.2,.8,.2,1)}.reveal.on{opacity:1;transform:none}
+footer{text-align:center;color:var(--dim);padding:40px 20px;border-top:1px solid var(--line);font-size:14px}
+@keyframes rise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+@keyframes pan{from{transform:scale(1.05) translateX(-1.5%)}to{transform:scale(1.12) translateX(1.5%)}}
+@media (max-width:720px){header nav{display:none}section{padding:48px 16px}}
+</style></head><body>
+<header><b>HYPERCAR-X DRIVE</b><nav><a href="#modes">Modes</a><a href="#shots">Screenshots</a><a href="#controls">Controls</a><a href="#download">Download</a><a href="https://github.com/jaineil32624/hypercar-x-drive-unity">GitHub</a></nav></header>
+
+<div class="hero">
+ <img src="shots/04_race_chase.png" alt="">
+ <div class="in">
+  <div class="kick">Unity 6 · 3D driving &amp; racing · PC · Web · Android</div>
+  <h1>HYPERCAR-X DRIVE</h1>
+  <p class="tag">Race AI, go head-to-head in split-screen, beat your own ghost, launch down the quarter mile, or hand the wheel to autopilot. Every number in the physics comes from the HYPERCAR-X engineering model.</p>
+  <div class="btns">
+   <a class="btn p" href="play/">▶ PLAY IN BROWSER<small>no install · keyboard or touch</small></a>
+   <a class="btn" href="downloads/HypercarX-Drive.apk">ANDROID APK<small>arm64 · Android 7+</small></a>
+   <a class="btn" href="downloads/HypercarX-Drive-Windows.zip">WINDOWS<small>unzip &amp; run</small></a>
+  </div>
+ </div>
+</div>
+
+<section id="modes" class="reveal"><div class="kick">Single player · multiplayer · spectate</div><h2>Game modes</h2><p>Pick one from the main menu. Laps, AI count and difficulty are in Settings.</p>
+<div class="modes">
+ <div class="m"><b>Race vs AI</b><span>1P</span><p>Up to 5 AI racers in all five HYPERCAR-X variants. Positions, lap and race times, results screen.</p></div>
+ <div class="m"><b>Split-screen race</b><span>2P</span><p>Two players on one PC or phone, each with their own camera, HUD and touch controls, plus AI racers.</p></div>
+ <div class="m"><b>Time trial vs your ghost</b><span>1P</span><p>Your best lap is replayed as a see-through ghost. Beat it to set a new record and a new ghost.</p></div>
+ <div class="m"><b>Ghost duel</b><span>SPECTATE</span><p>Your two best saved laps race each other.</p></div>
+ <div class="m"><b>Drag race ¼ mile</b><span>1P vs AI</span><p>Start lights, false starts, ET, trap speed and 0-60, checked against the engineering model.</p></div>
+ <div class="m"><b>AI vs AI</b><span>SPECTATE</span><p>Watch the AI race. Switch cars and cinematic cameras.</p></div>
+ <div class="m"><b>Autopilot</b><span>ANY MODE</span><p>Press P or AUTO to let the AI drive your car, and again to take it back.</p></div>
+ <div class="m"><b>Free roam</b><span>1P / 2P</span><p>Circuit, drag strip, skid pad, slalom and jump ramps, with a live 0-60 timer.</p></div>
+ <div class="m"><b>Garage</b><span>SETUP</span><p>5 variants, swappable wheels, tyres, aero, motors, battery and brakes, each with pros and cons. 7 paints.</p></div>
+</div></section>
+
+<section id="shots" class="reveal"><div class="kick">Captured by the game's self-test</div><h2>Screenshots</h2><p>Click to enlarge.</p><div class="gal" id="gal"></div></section>
+
+<section id="controls" class="reveal"><div class="kick">Keyboard · gamepad · touch</div><h2>Controls</h2><p>Touch controls appear automatically on phones and tablets.</p>
+<div class="tw"><table>
+<tr><th></th><th>Player 1</th><th>Player 2</th><th>Touch</th></tr>
+<tr><td>Throttle</td><td>W (↑ when solo)</td><td>↑</td><td>GAS</td></tr>
+<tr><td>Brake / reverse</td><td>S (↓ when solo)</td><td>↓</td><td>BRAKE</td></tr>
+<tr><td>Steer</td><td>A / D</td><td>← / →</td><td>◀ ▶ or tilt</td></tr>
+<tr><td>Handbrake drift</td><td>Space</td><td>Right Shift</td><td>DRIFT</td></tr>
+<tr><td>Camera</td><td>C</td><td>.</td><td>CAM</td></tr>
+<tr><td>Autopilot</td><td>P</td><td>/</td><td>AUTO</td></tr>
+<tr><td>Reset to track</td><td>R</td><td>,</td><td>RESET</td></tr>
+<tr><td>Pause</td><td>Esc</td><td></td><td>II</td></tr>
+</table></div></section>
+
+<section id="download" class="reveal"><div class="kick">Easy access</div><h2>Play &amp; download</h2><p>On Android, open the APK and allow "install unknown apps" when asked.</p>
+<div class="dl">
+ <a href="play/"><div class="i">🌐</div><h3>Play in browser</h3><p>WebGL build. Works on desktop browsers; phones should use the APK.</p></a>
+ <a href="downloads/HypercarX-Drive.apk"><div class="i">📱</div><h3>Android APK</h3><p>64-bit IL2CPP build with touch and tilt controls.</p></a>
+ <a href="downloads/HypercarX-Drive-Windows.zip"><div class="i">🖥️</div><h3>Windows</h3><p>Unzip and run HypercarX-Drive.exe.</p></a>
+ <a href="https://github.com/jaineil32624/hypercar-x-drive-unity"><div class="i">💻</div><h3>Source (Unity 6)</h3><p>Open in Unity 6000.3 and use the HYPERCAR-X menu to build.</p></a>
+ <a href="https://jaineil32624.github.io/hypercar-x/"><div class="i">🏎️</div><h3>Engineering model</h3><p>The parametric hypercar the game is built on.</p></a>
+</div></section>
+
+<footer>HYPERCAR-X Drive · made by Jaineil Rana · Unity 6 · <a href="https://github.com/jaineil32624/hypercar-x-drive-unity">GitHub</a></footer>
+<div class="lb" id="lb"><img id="lbi" alt=""></div>
+<script>
+const S=[["04_race_chase","Race vs AI: chase camera, minimap, autopilot"],["07_split_screen","2-player split-screen race"],["03_grid_countdown","Starting grid with touch controls"],["05_race_cinematic","Cinematic trackside camera"],["06_race_bonnet","Bonnet camera"],["09_ai_vs_ai","AI vs AI spectator mode"],["08_drag_result","Quarter-mile drag result vs the engineering model"],["02_garage","Garage: parts with pros and cons"],["01_menu","Main menu"],["10_free_roam_touch","Free roam with touch controls"]];
+const g=document.getElementById('gal'),lb=document.getElementById('lb'),li=document.getElementById('lbi');
+S.forEach(([f,c])=>{const e=document.createElement('figure');e.innerHTML=`<img loading="lazy" src="shots/${f}.png" alt="${c}"><figcaption>${c}</figcaption>`;e.onclick=()=>{li.src=`shots/${f}.png`;lb.classList.add('on')};g.appendChild(e)});
+lb.onclick=()=>lb.classList.remove('on');addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on')});
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on')}),{threshold:.1});document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+</script></body></html>

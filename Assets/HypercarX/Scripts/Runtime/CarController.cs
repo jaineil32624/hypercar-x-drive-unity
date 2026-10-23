@@ -156,7 +156,8 @@ namespace HypercarX
                     // traction control: never ask a tyre for more torque than μ·Fz·r (Python model's grip limit)
                     float maxT = wc.forwardFriction.stiffness * Mathf.Max(0f, hit.force) * wc.radius;
                     float tq = Mathf.Clamp(wheelTorque, -maxT, maxT);
-                    if (Mathf.Abs(hit.forwardSlip) > 0.3f) tq *= 0.5f;
+                    float over = Mathf.Abs(hit.forwardSlip) - wc.forwardFriction.extremumSlip;
+                    if (over > 0f) tq *= Mathf.Clamp(1f - over * 1.5f, 0.35f, 1f);   // ease off only past peak grip
                     wc.motorTorque = tq;
                     if (brake > 0.1f && Mathf.Abs(hit.forwardSlip) > 0.45f) bt *= 0.45f; // ABS
                     bool slip = Mathf.Abs(hit.sidewaysSlip) > 0.35f || Mathf.Abs(hit.forwardSlip) > 0.6f;

@@ -55,8 +55,15 @@ namespace HypercarX
                 float vAllowed = Mathf.Sqrt(vCorner * vCorner + 2f * car.spec.mu * 9.81f * 0.8f * dist);
                 vTarget = Mathf.Min(vTarget, vAllowed);
             }
+            // off the road: slow down and rejoin a point further ahead
+            float off = Vector3.Distance(Vector3.ProjectOnPlane(transform.position - tr[i], Vector3.up), Vector3.zero);
+            if (off > World.RoadWidth * 0.5f + 2f)
+            {
+                vTarget = Mathf.Min(vTarget, 16f);
+                steer = SteerTo(tr[(i + 4) % n]);
+            }
             float err = vTarget - speed;
-            car.throttle = Mathf.Clamp01(err * 0.25f) * (1f - Mathf.Abs(steer) * 0.35f);
+            car.throttle = Mathf.Clamp01(err * 0.25f) * (1f - Mathf.Abs(steer) * 0.6f);
             car.brake = err < -2f ? Mathf.Clamp01(-err * 0.12f) : 0f;
             car.handbrake = 0f;
             car.steer = steer;

@@ -37,7 +37,7 @@ namespace HypercarX
                     break;
                 }
                 case 2:
-                    transform.position = target.position + target.up * 1.05f + target.forward * 0.3f;
+                    transform.position = target.position + target.up * 1.22f + target.forward * 0.9f;
                     transform.rotation = Quaternion.LookRotation(target.forward, target.up);
                     break;
                 default:

@@ -306,7 +306,7 @@ namespace HypercarX
             for (int i = 0; i < 3; i++)
             {
                 var rc = SpawnCar(Garage.Resolve(i * 2 % 5, false), Garage.Paints[(i * 3) % Garage.Paints.Length], "Attract" + i,
-                    GridPos(i), world.gridRot, -1);
+                    GridPos(i), GridRot(i), -1);
                 rc.car.audioEnabled = false;
                 AddAI(rc, 0.8f, (i - 1) * 2.5f);
             }
@@ -316,11 +316,8 @@ namespace HypercarX
             running = true;
         }
 
-        Vector3 GridPos(int slot)
-        {
-            Vector3 dir = world.gridRot * Vector3.forward, right = world.gridRot * Vector3.right;
-            return world.gridPos - dir * (slot / 2) * 9f + right * ((slot % 2 == 0) ? -3.2f : 3.2f) - dir * (slot % 2) * 4f;
-        }
+        Vector3 GridPos(int slot) { world.GridSlot(slot, out var p, out _); return p; }
+        Quaternion GridRot(int slot) { world.GridSlot(slot, out _, out var q); return q; }
 
         void AddAI(Racer rc, float skill, float lane)
         {
@@ -348,13 +345,13 @@ namespace HypercarX
                 case Mode.SplitRace:
                 {
                     int humans = m == Mode.SplitRace ? 2 : 1;
-                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(aiCount + humans - 1), world.gridRot, 0);
+                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(aiCount + humans - 1), GridRot(aiCount + humans - 1), 0);
                     Racer p2 = null;
-                    if (humans == 2) p2 = SpawnCar(p2Spec, p2Paint, "P2", GridPos(aiCount), world.gridRot, 1);
+                    if (humans == 2) p2 = SpawnCar(p2Spec, p2Paint, "P2", GridPos(aiCount), GridRot(aiCount), 1);
                     for (int i = 0; i < aiCount; i++)
                     {
                         var rc = SpawnCar(Garage.Resolve(i % 5, false), Garage.Paints[(i + 2) % Garage.Paints.Length], "AI " + Garage.Variants[i % 5].id + (i + 1),
-                            GridPos(i), world.gridRot, -1);
+                            GridPos(i), GridRot(i), -1);
                         AddAI(rc, skill * (0.94f + 0.03f * (i % 3)), (i % 3 - 1) * 2.2f);
                     }
                     if (humans == 1) MakeView(p1, new Rect(0, 0, 1, 1), 0);
@@ -365,7 +362,7 @@ namespace HypercarX
                 }
                 case Mode.TimeTrial:
                 {
-                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(0), world.gridRot, 0);
+                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(0), GridRot(0), 0);
                     MakeView(p1, new Rect(0, 0, 1, 1), 0);
                     if (GhostBank.Laps.Count > 0) ghost = SpawnGhost(GhostBank.Laps[0], new Color(0.4f, 0.9f, 1f));
                     mapPanel.SetActive(true);
@@ -385,10 +382,10 @@ namespace HypercarX
                 case Mode.FreeRoam:
                 case Mode.SplitFree:
                 {
-                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(0), world.gridRot, 0);
+                    var p1 = SpawnCar(p1Spec, p1Paint, "P1", GridPos(0), GridRot(0), 0);
                     if (m == Mode.SplitFree)
                     {
-                        var p2 = SpawnCar(p2Spec, p2Paint, "P2", GridPos(1), world.gridRot, 1);
+                        var p2 = SpawnCar(p2Spec, p2Paint, "P2", GridPos(1), GridRot(1), 1);
                         MakeView(p1, new Rect(0, 0, 0.5f, 1), 0); MakeView(p2, new Rect(0.5f, 0, 0.5f, 1), 1);
                     }
                     else MakeView(p1, new Rect(0, 0, 1, 1), 0);
@@ -403,7 +400,7 @@ namespace HypercarX
                     for (int i = 0; i < n; i++)
                     {
                         var rc = SpawnCar(Garage.Resolve(i % 5, false), Garage.Paints[i % Garage.Paints.Length], "AI " + Garage.Variants[i % 5].id + (i + 1),
-                            GridPos(i), world.gridRot, -1);
+                            GridPos(i), GridRot(i), -1);
                         AddAI(rc, skill * (0.92f + 0.03f * (i % 4)), (i % 3 - 1) * 2.2f);
                     }
                     var v = MakeView(racers[0], new Rect(0, 0, 1, 1), -1);
@@ -690,8 +687,8 @@ namespace HypercarX
             if (!running || countdown) return;
             var r = racers.Find(x => x.car == car);
             if (r == null || r.finished) return;
-            if (index != r.nextCp) return;
             int n = world.checkpoints.Count;
+            if (index != r.nextCp && index != (r.nextCp + 1) % n) return;
             if (index == 0)
             {
                 if (r.lap >= 1)

@@ -141,17 +141,23 @@ namespace HypercarX
 
             // ---- brakes with simple ABS
             float brakeTorque = (reversing ? 0f : brake) * spec.mu * spec.mass * G * r / 4f * 1.15f * spec.brakeScale;
+            if (Mathf.Abs(v) > vMotorMax * 1.01f) brakeTorque = Mathf.Max(brakeTorque, 400f); // motor regen holds the rpm limit
 
             Slipping = false;
             Grounded = false;
             for (int i = 0; i < 4; i++)
             {
                 var wc = wheels[i];
-                wc.motorTorque = wheelTorque;
+                wc.motorTorque = 0f;
                 float bt = brakeTorque;
                 if (wc.GetGroundHit(out WheelHit hit))
                 {
                     Grounded = true;
+                    // traction control: never ask a tyre for more torque than μ·Fz·r (Python model's grip limit)
+                    float maxT = wc.forwardFriction.stiffness * Mathf.Max(0f, hit.force) * wc.radius;
+                    float tq = Mathf.Clamp(wheelTorque, -maxT, maxT);
+                    if (Mathf.Abs(hit.forwardSlip) > 0.3f) tq *= 0.5f;
+                    wc.motorTorque = tq;
                     if (brake > 0.1f && Mathf.Abs(hit.forwardSlip) > 0.45f) bt *= 0.45f; // ABS
                     bool slip = Mathf.Abs(hit.sidewaysSlip) > 0.35f || Mathf.Abs(hit.forwardSlip) > 0.6f;
                     if (slip && speed > 3f) Slipping = true;

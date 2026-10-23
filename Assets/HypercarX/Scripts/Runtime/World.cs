@@ -10,7 +10,7 @@ namespace HypercarX
         public const float RoadWidth = 14f;
         public List<Vector3> track = new List<Vector3>();      // dense centreline samples
         public List<Transform> checkpoints = new List<Transform>();
-        public Vector3 gridPos; public Quaternion gridRot;
+        public Vector3 gridPos; public Quaternion gridRot; public int gridIndex0;
         public Vector3 dragPos; public Quaternion dragRot;
         public Vector3 freePos; public Quaternion freeRot;
         public Transform dragFinish;
@@ -125,6 +125,7 @@ namespace HypercarX
             Gantry(p0, dir, "HYPERCAR-X  CIRCUIT");
             gridPos = p0 - dir * 12f + Vector3.up * 0.6f;
             gridRot = Quaternion.LookRotation(dir);
+            gridIndex0 = track.Count - 2;
             freePos = gridPos; freeRot = gridRot;
 
             // checkpoints every ~1/12 of the lap; index 0 is the finish line
@@ -138,7 +139,7 @@ namespace HypercarX
                 go.transform.position = a + Vector3.up * 2f;
                 go.transform.rotation = Quaternion.LookRotation((b - a).normalized);
                 var bc = go.AddComponent<BoxCollider>();
-                bc.isTrigger = true; bc.size = new Vector3(RoadWidth + 8f, 6f, 3f);
+                bc.isTrigger = true; bc.size = new Vector3(RoadWidth + 40f, 8f, 4f);
                 go.AddComponent<Checkpoint>().index = i;
                 checkpoints.Add(go.transform);
             }
@@ -359,6 +360,17 @@ namespace HypercarX
                 h.GetComponent<Renderer>().sharedMaterial = M("Hill");
                 h.GetComponent<Renderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             }
+        }
+
+        /// <summary>Starting-grid slot laid out along the real track behind the start line (two columns).</summary>
+        public void GridSlot(int slot, out Vector3 pos, out Quaternion rot)
+        {
+            int n = track.Count;
+            int i = ((gridIndex0 - slot) % n + n) % n;          // ~9.6 m per sample, staggered columns
+            Vector3 a = track[i], b = track[(i + 1) % n];
+            Vector3 f = (b - a).normalized, right = Vector3.Cross(Vector3.up, f);
+            pos = a + right * ((slot % 2 == 0) ? -3.4f : 3.4f) + Vector3.up * 0.6f;
+            rot = Quaternion.LookRotation(f);
         }
 
         /// <summary>Distance along the circuit of the closest centreline sample (for the minimap / reset).</summary>

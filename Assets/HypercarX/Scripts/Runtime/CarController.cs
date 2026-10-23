@@ -113,6 +113,17 @@ namespace HypercarX
                 wc.sidewaysFriction = sd;
             }
             if (wing) wing.gameObject.SetActive(s.cl > 0.05f);
+            wheels[0].ConfigureVehicleSubsteps(5f, 12, 15);   // accurate tyre forces at launch
+        }
+
+        public string Diag()
+        {
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < 4; i++)
+                if (wheels[i].GetGroundHit(out WheelHit h))
+                    sb.Append($"[w{i} Fz={h.force:0} sx={h.forwardSlip:0.00} sy={h.sidewaysSlip:0.00} T={wheels[i].motorTorque:0} rpm={wheels[i].rpm:0}] ");
+            sb.Append($"a={GForce.z:0.00}g v={SpeedKmh:0}");
+            return sb.ToString();
         }
 
         void FixedUpdate()

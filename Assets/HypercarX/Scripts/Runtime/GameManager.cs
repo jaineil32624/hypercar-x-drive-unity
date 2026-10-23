@@ -62,6 +62,7 @@ namespace HypercarX
         {
             I = this;
             Application.targetFrameRate = 60;
+            Time.fixedDeltaTime = 0.01f;   // 100 Hz physics for stable WheelColliders
             QualitySettings.vSyncCount = 0;
             Input.multiTouchEnabled = true;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -126,7 +127,11 @@ namespace HypercarX
             yield return Shot(dir, "07_split_screen");
             StartMode(Mode.Drag);
             autoDrag = true;
-            yield return new WaitForSeconds(16f);
+            for (int i = 0; i < 32; i++)
+            {
+                yield return new WaitForSeconds(0.5f);
+                if (dragGreen > 0 && i % 2 == 0 && racers.Count > 0) Debug.Log("[HXTEST] dragdiag t=" + (Time.time - dragGreen).ToString("0.0") + " " + racers[0].car.Diag());
+            }
             LogRacers("drag");
             yield return Shot(dir, "08_drag_result");
             autoDrag = false;

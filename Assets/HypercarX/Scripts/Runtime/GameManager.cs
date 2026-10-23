@@ -74,6 +74,78 @@ namespace HypercarX
             BuildUI();
             ShowMain();
             StartAttract();
+            var args = System.Environment.GetCommandLineArgs();
+            int ai = System.Array.IndexOf(args, "-hxautotest");
+            if (ai >= 0) StartCoroutine(AutoTest(ai + 1 < args.Length ? args[ai + 1] : "."));
+        }
+
+        // ================================================================= self-test (-hxautotest <dir>)
+        bool autoDrag;
+        IEnumerator Shot(string dir, string name)
+        {
+            yield return new WaitForEndOfFrame();
+            ScreenCapture.CaptureScreenshot(System.IO.Path.Combine(dir, name + ".png"));
+            Debug.Log("[HXTEST] shot " + name);
+        }
+
+        void LogRacers(string tag)
+        {
+            foreach (var r in racers)
+                Debug.Log($"[HXTEST] {tag} {r.label} v={r.car.SpeedKmh:0}km/h lap={r.lap} cp={r.nextCp} place={r.place} best={r.best:0.00} 0-60={r.zero60:0.00} 0-100={r.zero100:0.00} y={r.car.transform.position.y:0.00} grounded={r.car.Grounded}");
+        }
+
+        IEnumerator AutoTest(string dir)
+        {
+            System.IO.Directory.CreateDirectory(dir);
+            yield return new WaitForSeconds(3f);
+            yield return Shot(dir, "01_menu");
+            ShowGarage(); yield return new WaitForSeconds(0.5f); yield return Shot(dir, "02_garage");
+            ShowMain();
+            aiCount = 5; laps = 1;
+            StartMode(Mode.Race);
+            yield return new WaitForSeconds(3.2f);
+            yield return Shot(dir, "03_grid_countdown");
+            yield return new WaitForSeconds(1.5f);
+            ToggleAutopilot(views[0]);
+            for (int i = 0; i < 40; i++)
+            {
+                yield return new WaitForSeconds(1f);
+                if (i % 5 == 0) LogRacers("race t=" + i);
+                if (i == 6) yield return Shot(dir, "04_race_chase");
+                if (i == 14) { views[0].cc.mode = 3; }
+                if (i == 17) yield return Shot(dir, "05_race_cinematic");
+                if (i == 20) { views[0].cc.mode = 2; }
+                if (i == 22) yield return Shot(dir, "06_race_bonnet");
+                if (i == 23) views[0].cc.mode = 0;
+            }
+            StartMode(Mode.SplitRace);
+            yield return new WaitForSeconds(4.8f);
+            ToggleAutopilot(views[0]); ToggleAutopilot(views[1]);
+            yield return new WaitForSeconds(9f);
+            LogRacers("split");
+            yield return Shot(dir, "07_split_screen");
+            StartMode(Mode.Drag);
+            autoDrag = true;
+            yield return new WaitForSeconds(16f);
+            LogRacers("drag");
+            yield return Shot(dir, "08_drag_result");
+            autoDrag = false;
+            StartMode(Mode.AIvsAI);
+            yield return new WaitForSeconds(14f);
+            views[0].cc.mode = 3;
+            yield return new WaitForSeconds(3f);
+            LogRacers("aivsai");
+            yield return Shot(dir, "09_ai_vs_ai");
+            StartMode(Mode.FreeRoam);
+            touchMode = 1;
+            yield return new WaitForSeconds(1f);
+            StartMode(Mode.FreeRoam);
+            yield return new WaitForSeconds(2f);
+            yield return Shot(dir, "10_free_roam_touch");
+            touchMode = PlayerPrefs.GetInt("hx_touch", 0);
+            Debug.Log("[HXTEST] done");
+            yield return new WaitForSeconds(1f);
+            Application.Quit();
         }
 
         void LoadSettings()
@@ -563,6 +635,7 @@ namespace HypercarX
                 if (v.left.held) st -= 1; if (v.right.held) st += 1;
                 if (tilt && Application.isMobilePlatform && !v.left.held && !v.right.held) st = Mathf.Clamp(Input.acceleration.x * 2.2f, -1f, 1f);
             }
+            if (autoDrag && mode == Mode.Drag) { thr = dragGreen > 0 && v.racer.car.transform.position.z < 430f ? 1f : 0f; brk = v.racer.car.transform.position.z >= 430f ? 1f : 0f; st = Mathf.Clamp((-164.5f - v.racer.car.transform.position.x) * 0.3f, -1f, 1f); }
             if (mode == Mode.Drag && dragGreen < 0 && thr > 0.1f && !falseStart) { falseStart = true; }
             c.throttle = thr; c.brake = brk; c.steer = Mathf.Clamp(st, -1f, 1f); c.handbrake = hb;
         }

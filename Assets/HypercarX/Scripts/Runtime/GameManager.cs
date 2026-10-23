@@ -202,16 +202,25 @@ namespace HypercarX
             Bounds b = body.bounds;
             float len = Mathf.Max(b.size.x, b.size.z);
             model.transform.localScale *= 4.62f / Mathf.Max(0.01f, len);
-            // orient so front axle points +Z of the car
-            Vector3 f = (spins[0].position + spins[1].position) * 0.5f, r = (spins[2].position + spins[3].position) * 0.5f;
-            Vector3 dir = parent.InverseTransformDirection(f - r); dir.y = 0f;
-            model.transform.localRotation = Quaternion.FromToRotation(dir.normalized, Vector3.forward) * model.transform.localRotation;
-            // left wheels must be at -X (Unity left); if mirrored, swap tags
+            // full orientation from the wheels: forward = rear->front axle, left = right->left wheels,
+            // up = left x forward. Fixes FBX axis conversions of any kind.
+            Vector3 L(Transform t) => parent.InverseTransformPoint(t.position);
+            Vector3 fwdL = ((L(spins[0]) + L(spins[1])) - (L(spins[2]) + L(spins[3]))).normalized;
+            Vector3 leftL = ((L(spins[0]) + L(spins[2])) - (L(spins[1]) + L(spins[3]))).normalized;
+            Vector3 upL = Vector3.Cross(leftL, fwdL).normalized; // (-X) x (+Z) = +Y
+            if (upL.sqrMagnitude < 0.5f) upL = Vector3.up;
+            model.transform.localRotation = Quaternion.Inverse(Quaternion.LookRotation(fwdL, upL)) * model.transform.localRotation;
+            // the body must sit above the wheels; if not, the left/right labels were mirrored: flip upside up
+            Vector3 bodyC = parent.InverseTransformPoint(body.bounds.center);
+            float wheelY = (L(spins[0]).y + L(spins[1]).y + L(spins[2]).y + L(spins[3]).y) / 4f;
+            if (bodyC.y < wheelY) model.transform.localRotation = Quaternion.AngleAxis(180f, Vector3.forward) * model.transform.localRotation;
+            // left wheels must be at -X (Unity left)
             if (parent.InverseTransformPoint(spins[0].position).x > 0f)
             {
                 (spins[0], spins[1]) = (spins[1], spins[0]);
                 (spins[2], spins[3]) = (spins[3], spins[2]);
             }
+            Vector3 f, r;
             // centre between axles, wheel centres at 0.355 m
             f = parent.InverseTransformPoint((spins[0].position + spins[1].position) * 0.5f);
             r = parent.InverseTransformPoint((spins[2].position + spins[3].position) * 0.5f);

@@ -76,7 +76,7 @@ namespace HypercarX
             StartAttract();
             var args = System.Environment.GetCommandLineArgs();
             int ai = System.Array.IndexOf(args, "-hxautotest");
-            if (ai >= 0) StartCoroutine(AutoTest(ai + 1 < args.Length ? args[ai + 1] : "."));
+            if (ai >= 0) new GameObject("AutoTest").AddComponent<CoroutineRunner>().StartCoroutine(AutoTest(ai + 1 < args.Length ? args[ai + 1] : "."));
         }
 
         // ================================================================= self-test (-hxautotest <dir>)

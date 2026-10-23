@@ -505,6 +505,7 @@ namespace HypercarX
                 }
                 if (mode == Mode.AIvsAI) Btn(bar, "NEXT CAR", () => { spectateIndex = (spectateIndex + 1) % racers.Count; v.racer = racers[spectateIndex]; v.cc.target = v.racer.car.transform; }, 0);
                 if (mode == Mode.Menu) bar.gameObject.SetActive(false);
+                foreach (var t in bar.GetComponentsInChildren<Text>()) { t.fontSize = narrow ? 20 : 26; t.horizontalOverflow = HorizontalWrapMode.Overflow; }
             }
 
             // touch controls for human players
@@ -641,7 +642,7 @@ namespace HypercarX
                 if (v.left.held) st -= 1; if (v.right.held) st += 1;
                 if (tilt && Application.isMobilePlatform && !v.left.held && !v.right.held) st = Mathf.Clamp(Input.acceleration.x * 2.2f, -1f, 1f);
             }
-            if (autoDrag && mode == Mode.Drag) { thr = dragGreen > 0 && v.racer.car.transform.position.z < 430f ? 1f : 0f; brk = v.racer.car.transform.position.z >= 430f ? 1f : 0f; st = Mathf.Clamp((-164.5f - v.racer.car.transform.position.x) * 0.3f, -1f, 1f); }
+            if (autoDrag && mode == Mode.Drag) { thr = dragGreen > 0 && v.racer.car.transform.position.z < 430f ? 1f : 0f; brk = v.racer.car.transform.position.z >= 430f ? 1f : 0f; st = Mathf.Clamp((-164.5f - v.racer.car.transform.position.x) * 0.06f - v.racer.car.transform.forward.x * 3f, -0.4f, 0.4f); }
             if (mode == Mode.Drag && dragGreen < 0 && thr > 0.1f && !falseStart) { falseStart = true; }
             c.throttle = thr; c.brake = brk; c.steer = Mathf.Clamp(st, -1f, 1f); c.handbrake = hb;
         }

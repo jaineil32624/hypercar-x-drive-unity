@@ -144,14 +144,14 @@ namespace HypercarX
             if (Mathf.Abs(v) >= vMotorMax) force = 0f;
             MotorRpm = Mathf.Abs(v) / r * spec.gear * 60f / (2f * Mathf.PI);
 
-            if (locked) { throttle = 0f; brake = 1f; }
             float drive = throttle;
             bool reversing = false;
-            if (brake > 0.1f && v < 1.0f && throttle < 0.1f) { drive = -0.35f * brake; reversing = true; }
+            if (locked) { drive = 0f; }   // held on the grid: brakes only, never reverse
+            else if (brake > 0.1f && v < 1.0f && throttle < 0.1f) { drive = -0.35f * brake; reversing = true; }
             float wheelTorque = drive * force * r / 4f;
 
             // ---- brakes with simple ABS
-            float brakeTorque = (reversing ? 0f : brake) * spec.mu * spec.mass * G * r / 4f * 1.15f * spec.brakeScale;
+            float brakeTorque = (locked ? 1f : (reversing ? 0f : brake)) * spec.mu * spec.mass * G * r / 4f * 1.15f * spec.brakeScale;
             if (Mathf.Abs(v) > vMotorMax * 1.01f) brakeTorque = Mathf.Max(brakeTorque, 400f); // motor regen holds the rpm limit
 
             Slipping = false;
